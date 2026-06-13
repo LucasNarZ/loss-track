@@ -9,7 +9,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "products")
 public class Product {
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "uuid")

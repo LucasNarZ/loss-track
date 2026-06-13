@@ -1,5 +1,7 @@
 package com.lucasnarloch.loss_track.product;
 
+import com.lucasnarloch.loss_track.product.dtos.ProductRequestDTO;
+import com.lucasnarloch.loss_track.product.dtos.ProductResponseDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,23 +20,23 @@ public class ProductController {
     
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Product save(@Valid @RequestBody ProductDTO productDto) {
-        return productService.save(productDto);
+    public ProductResponseDTO save(@Valid @RequestBody ProductRequestDTO productRequestDto) {
+        return productService.save(productRequestDto);
     }
 
     @GetMapping("/{id}")
-    public Product findById(@PathVariable UUID id) {
+    public ProductResponseDTO findById(@PathVariable UUID id) {
         return productService.findById(id);
     }
 
     @GetMapping
-    public List<Product> findAll() {
+    public List<ProductResponseDTO> findAll() {
         return productService.findAll();
     }
 
     @PutMapping("/{id}")
-    public Product update(@PathVariable UUID id, @Valid @RequestBody ProductDTO productDto) {
-        return productService.update(id, productDto);
+    public ProductResponseDTO update(@PathVariable UUID id, @Valid @RequestBody ProductRequestDTO productRequestDto) {
+        return productService.update(id, productRequestDto);
     }
 
     @DeleteMapping("/{id}")

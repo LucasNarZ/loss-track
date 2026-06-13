@@ -1,5 +1,7 @@
 package com.lucasnarloch.loss_track.product;
 
+import com.lucasnarloch.loss_track.product.dtos.ProductRequestDTO;
+import com.lucasnarloch.loss_track.product.dtos.ProductResponseDTO;
 import com.lucasnarloch.loss_track.product.exceptions.ProductNotFound;
 import org.springframework.stereotype.Service;
 
@@ -14,27 +16,33 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public Product save(ProductDTO productDto) {
-        Product product = new Product(productDto.name(), productDto.barcode(), productDto.category());
-        return productRepository.save(product);
+    public ProductResponseDTO save(ProductRequestDTO productRequestDto) {
+        Product product = new Product(productRequestDto.name(), productRequestDto.barcode(), productRequestDto.category());
+        return new ProductResponseDTO(productRepository.save(product));
     }
 
-    public Product findById(UUID id) {
-        return productRepository.findById(id).orElseThrow(ProductNotFound::new);
+    public ProductResponseDTO findById(UUID id) {
+        Product product = findEntityById(id);
+        return new ProductResponseDTO(product);
     }
 
-    public List<Product> findAll() {
-        return productRepository.findAll();
+    public List<ProductResponseDTO> findAll() {
+        List<Product> products = productRepository.findAll();
+        return products.stream().map(ProductResponseDTO::new).toList();
     }
 
-    public Product update(UUID id, ProductDTO productDto) {
-        Product product = findById(id);
-        product.update(productDto.name(), productDto.barcode(), productDto.category());
-        return productRepository.save(product);
+    public ProductResponseDTO update(UUID id, ProductRequestDTO productRequestDto) {
+        Product product = findEntityById(id);
+        product.update(productRequestDto.name(), productRequestDto.barcode(), productRequestDto.category());
+        return new ProductResponseDTO(productRepository.save(product));
     }
 
     public void delete(UUID id) {
-        Product product = findById(id);
+        Product product = findEntityById(id);
         productRepository.delete(product);
+    }
+
+    private Product findEntityById(UUID id) {
+        return productRepository.findById(id).orElseThrow(ProductNotFound::new);
     }
 }

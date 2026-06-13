@@ -1,7 +1,9 @@
 package com.lucasnarloch.loss_track.exceptions;
 
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,8 +22,8 @@ public class GlobalExceptionHandler {
                 .stream()
                 .collect(
                         java.util.stream.Collectors.toMap(
-                                error -> error.getField(),
-                                error -> error.getDefaultMessage()
+                                FieldError::getField,
+                                DefaultMessageSourceResolvable::getDefaultMessage
                         )
                 );
 
