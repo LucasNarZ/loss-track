@@ -29,4 +29,10 @@ public class Product {
         this.category = category;
     }
 
+    public void update(String name, String barcode, String category) {
+        this.name = name;
+        this.barcode = barcode;
+        this.category = category;
+    }
+
 }

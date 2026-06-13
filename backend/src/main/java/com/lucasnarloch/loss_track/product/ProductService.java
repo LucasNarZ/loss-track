@@ -26,4 +26,15 @@ public class ProductService {
     public List<Product> findAll() {
         return productRepository.findAll();
     }
+
+    public Product update(UUID id, ProductDTO productDto) {
+        Product product = findById(id);
+        product.update(productDto.name(), productDto.barcode(), productDto.category());
+        return productRepository.save(product);
+    }
+
+    public void delete(UUID id) {
+        Product product = findById(id);
+        productRepository.delete(product);
+    }
 }

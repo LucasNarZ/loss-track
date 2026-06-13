@@ -1,7 +1,7 @@
 package com.lucasnarloch.loss_track.product;
 
 import jakarta.validation.Valid;
-import org.apache.catalina.LifecycleState;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,13 +10,14 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/products")
 public class ProductController {
-    private ProductService productService;
+    private final ProductService productService;
 
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
     
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Product save(@Valid @RequestBody ProductDTO productDto) {
         return productService.save(productDto);
     }
@@ -29,6 +30,17 @@ public class ProductController {
     @GetMapping
     public List<Product> findAll() {
         return productService.findAll();
+    }
+
+    @PutMapping("/{id}")
+    public Product update(@PathVariable UUID id, @Valid @RequestBody ProductDTO productDto) {
+        return productService.update(id, productDto);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable UUID id) {
+        productService.delete(id);
     }
 
 }
