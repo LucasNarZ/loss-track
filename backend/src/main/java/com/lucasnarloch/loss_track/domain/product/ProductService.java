@@ -1,8 +1,8 @@
-package com.lucasnarloch.loss_track.product;
+package com.lucasnarloch.loss_track.domain.product;
 
-import com.lucasnarloch.loss_track.product.dtos.ProductRequestDTO;
-import com.lucasnarloch.loss_track.product.dtos.ProductResponseDTO;
-import com.lucasnarloch.loss_track.product.exceptions.ProductNotFound;
+import com.lucasnarloch.loss_track.domain.product.dtos.ProductRequestDTO;
+import com.lucasnarloch.loss_track.domain.product.dtos.ProductResponseDTO;
+import com.lucasnarloch.loss_track.domain.product.exceptions.ProductNotFound;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -1,8 +1,11 @@
 package com.lucasnarloch.loss_track.product;
 
-import com.lucasnarloch.loss_track.product.dtos.ProductRequestDTO;
-import com.lucasnarloch.loss_track.product.dtos.ProductResponseDTO;
-import com.lucasnarloch.loss_track.product.exceptions.ProductNotFound;
+import com.lucasnarloch.loss_track.domain.product.Product;
+import com.lucasnarloch.loss_track.domain.product.ProductRepository;
+import com.lucasnarloch.loss_track.domain.product.ProductService;
+import com.lucasnarloch.loss_track.domain.product.dtos.ProductRequestDTO;
+import com.lucasnarloch.loss_track.domain.product.dtos.ProductResponseDTO;
+import com.lucasnarloch.loss_track.domain.product.exceptions.ProductNotFound;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

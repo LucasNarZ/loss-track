@@ -1,4 +1,4 @@
-package com.lucasnarloch.loss_track.product.dtos;
+package com.lucasnarloch.loss_track.domain.product.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 

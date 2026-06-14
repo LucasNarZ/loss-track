@@ -1,6 +1,6 @@
-package com.lucasnarloch.loss_track.product.dtos;
+package com.lucasnarloch.loss_track.domain.product.dtos;
 
-import com.lucasnarloch.loss_track.product.Product;
+import com.lucasnarloch.loss_track.domain.product.Product;
 
 import java.util.UUID;
 

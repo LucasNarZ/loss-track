@@ -1,4 +1,4 @@
-package com.lucasnarloch.loss_track.product;
+package com.lucasnarloch.loss_track.domain.product;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
