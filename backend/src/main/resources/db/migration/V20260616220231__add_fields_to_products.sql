@@ -1,0 +1,17 @@
+ALTER TABLE products
+    ADD COLUMN tenant_id UUID NOT NULL,
+    ADD COLUMN sku VARCHAR(255) NOT NULL,
+    ADD COLUMN unit VARCHAR(255) NOT NULL,
+    ADD COLUMN cost_price NUMERIC(19, 2) NOT NULL,
+    ADD COLUMN status VARCHAR(50) NOT NULL DEFAULT 'ACTIVE',
+    ADD COLUMN created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ADD COLUMN updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE products
+    ADD CONSTRAINT fk_products_tenant
+        FOREIGN KEY (tenant_id)
+            REFERENCES tenants(id);
+
+ALTER TABLE products
+    ADD CONSTRAINT uk_product_tenant_sku
+        UNIQUE (tenant_id, sku);

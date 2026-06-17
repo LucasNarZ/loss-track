@@ -6,6 +6,9 @@ import com.lucasnarloch.loss_track.domain.product.ProductService;
 import com.lucasnarloch.loss_track.domain.product.dtos.ProductRequestDTO;
 import com.lucasnarloch.loss_track.domain.product.dtos.ProductResponseDTO;
 import com.lucasnarloch.loss_track.domain.product.exceptions.ProductNotFound;
+import com.lucasnarloch.loss_track.domain.tenant.Tenant;
+import com.lucasnarloch.loss_track.domain.tenant.TenantPlan;
+import com.lucasnarloch.loss_track.domain.tenant.TenantRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -13,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,43 +34,60 @@ class ProductServiceTest {
     @Mock
     private ProductRepository productRepository;
 
+    @Mock
+    private TenantRepository tenantRepository;
+
     @InjectMocks
     private ProductService productService;
 
     @Test
     void saveShouldCreateProductAndReturnResponseDto() {
-        ProductRequestDTO request = new ProductRequestDTO("Notebook", "123456", "Eletronicos");
+        UUID tenantId = UUID.randomUUID();
+        Tenant tenant = new Tenant("Empresa", "12345678000190", TenantPlan.BASIC);
+        ProductRequestDTO request = new ProductRequestDTO(tenantId, "Notebook", "NOTE-001", "123456", "Eletronicos", "UN", BigDecimal.TEN);
 
+        when(tenantRepository.findById(tenantId)).thenReturn(Optional.of(tenant));
         when(productRepository.save(any(Product.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         ProductResponseDTO response = productService.save(request);
 
         assertEquals("Notebook", response.name());
+        assertEquals("NOTE-001", response.sku());
         assertEquals("123456", response.barcode());
         assertEquals("Eletronicos", response.category());
+        assertEquals("UN", response.unit());
+        assertEquals(BigDecimal.TEN, response.costPrice());
 
         ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
         verify(productRepository).save(productCaptor.capture());
 
         Product savedProduct = productCaptor.getValue();
+        assertEquals(tenant, savedProduct.getTenant());
         assertEquals("Notebook", savedProduct.getName());
+        assertEquals("NOTE-001", savedProduct.getSku());
         assertEquals("123456", savedProduct.getBarcode());
         assertEquals("Eletronicos", savedProduct.getCategory());
+        assertEquals("UN", savedProduct.getUnit());
+        assertEquals(BigDecimal.TEN, savedProduct.getCostPrice());
     }
 
     @Test
     void findByIdShouldReturnResponseDtoWhenProductExists() {
         UUID id = UUID.randomUUID();
-        Product product = new Product("Notebook", "123456", "Eletronicos");
+        Tenant tenant = new Tenant("Empresa", "12345678000190", TenantPlan.BASIC);
+        Product product = new Product(tenant, "Notebook", "NOTE-001", "123456", "Eletronicos", "UN", BigDecimal.TEN);
 
         when(productRepository.findById(id)).thenReturn(Optional.of(product));
 
         ProductResponseDTO response = productService.findById(id);
 
         assertEquals("Notebook", response.name());
+        assertEquals("NOTE-001", response.sku());
         assertEquals("123456", response.barcode());
         assertEquals("Eletronicos", response.category());
+        assertEquals("UN", response.unit());
+        assertEquals(BigDecimal.TEN, response.costPrice());
     }
 
     @Test
@@ -80,8 +101,9 @@ class ProductServiceTest {
 
     @Test
     void findAllShouldReturnResponseDtoList() {
-        Product firstProduct = new Product("Notebook", "123456", "Eletronicos");
-        Product secondProduct = new Product("Cadeira", "654321", "Moveis");
+        Tenant tenant = new Tenant("Empresa", "12345678000190", TenantPlan.BASIC);
+        Product firstProduct = new Product(tenant, "Notebook", "NOTE-001", "123456", "Eletronicos", "UN", BigDecimal.TEN);
+        Product secondProduct = new Product(tenant, "Cadeira", "CAD-001", "654321", "Moveis", "UN", BigDecimal.ONE);
 
         when(productRepository.findAll()).thenReturn(List.of(firstProduct, secondProduct));
 
@@ -95,8 +117,10 @@ class ProductServiceTest {
     @Test
     void updateShouldUpdateProductAndReturnResponseDtoWhenProductExists() {
         UUID id = UUID.randomUUID();
-        Product product = new Product("Notebook", "123456", "Eletronicos");
-        ProductRequestDTO request = new ProductRequestDTO("Monitor", "789012", "Informatica");
+        UUID tenantId = UUID.randomUUID();
+        Tenant tenant = new Tenant("Empresa", "12345678000190", TenantPlan.BASIC);
+        Product product = new Product(tenant, "Notebook", "NOTE-001", "123456", "Eletronicos", "UN", BigDecimal.TEN);
+        ProductRequestDTO request = new ProductRequestDTO(tenantId, "Monitor", "MON-001", "789012", "Informatica", "UN", BigDecimal.ONE);
 
         when(productRepository.findById(id)).thenReturn(Optional.of(product));
         when(productRepository.save(product)).thenReturn(product);
@@ -104,11 +128,17 @@ class ProductServiceTest {
         ProductResponseDTO response = productService.update(id, request);
 
         assertEquals("Monitor", response.name());
+        assertEquals("MON-001", response.sku());
         assertEquals("789012", response.barcode());
         assertEquals("Informatica", response.category());
+        assertEquals("UN", response.unit());
+        assertEquals(BigDecimal.ONE, response.costPrice());
         assertEquals("Monitor", product.getName());
+        assertEquals("MON-001", product.getSku());
         assertEquals("789012", product.getBarcode());
         assertEquals("Informatica", product.getCategory());
+        assertEquals("UN", product.getUnit());
+        assertEquals(BigDecimal.ONE, product.getCostPrice());
 
         verify(productRepository).save(product);
     }
@@ -116,7 +146,7 @@ class ProductServiceTest {
     @Test
     void updateShouldThrowProductNotFoundWhenProductDoesNotExist() {
         UUID id = UUID.randomUUID();
-        ProductRequestDTO request = new ProductRequestDTO("Monitor", "789012", "Informatica");
+        ProductRequestDTO request = new ProductRequestDTO(UUID.randomUUID(), "Monitor", "MON-001", "789012", "Informatica", "UN", BigDecimal.ONE);
 
         when(productRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -127,7 +157,8 @@ class ProductServiceTest {
     @Test
     void deleteShouldDeleteProductWhenProductExists() {
         UUID id = UUID.randomUUID();
-        Product product = new Product("Notebook", "123456", "Eletronicos");
+        Tenant tenant = new Tenant("Empresa", "12345678000190", TenantPlan.BASIC);
+        Product product = new Product(tenant, "Notebook", "NOTE-001", "123456", "Eletronicos", "UN", BigDecimal.TEN);
 
         when(productRepository.findById(id)).thenReturn(Optional.of(product));
 
